@@ -48,8 +48,3 @@ if [ "$POWERLINE_DETECT_SSH" != "" ]; then
   fi
 fi
 PROMPT="$POWERLINE_SEC1_BG$POWERLINE_SEC1_TXT %n %k%f$POWERLINE_SEC1_FG%K{blue}"$'\u2b80'"%k%f%F{white}%K{blue} "$POWERLINE_CURRENT_PATH" "$POWERLINE_GIT_INFO_LEFT"%k%f%F{blue}"$'\u2b80'"%f "
-
-if [ "$POWERLINE_NO_BLANK_LINE" = "" ]; then
-    PROMPT="
-"$PROMPT
-fi
