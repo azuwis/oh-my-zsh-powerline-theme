@@ -1,10 +1,26 @@
 # FreeAgent puts the powerline style in zsh !
 
-if [ "$POWERLINE_RIGHT" = "" ]; then
-  POWERLINE_RIGHT=%D{%H:%M:%S}
+if [ "$POWERLINE_DATE_FORMAT" = "" ]; then
+  POWERLINE_DATE_FORMAT=%D{%Y-%m-%d}
 fi
 
-if [ "$POWERLINE_HIDE_USER_NAME" = "" ]; then
+if [ "$POWERLINE_RIGHT_B" = "" ]; then
+  POWERLINE_RIGHT_B=%D{%H:%M:%S}
+fi
+
+if [ "$POWERLINE_RIGHT_A" = "mixed" ]; then
+  POWERLINE_RIGHT_A=%(?."$POWERLINE_DATE_FORMAT".%F{red}✘ %?)
+elif [ "$POWERLINE_RIGHT_A" = "exit-status" ]; then
+  POWERLINE_RIGHT_A=%(?.%F{green}✔ %?.%F{red}✘ %?)
+elif [ "$POWERLINE_RIGHT_A" = "date" ]; then
+  POWERLINE_RIGHT_A="$POWERLINE_DATE_FORMAT"
+fi
+
+if [ "$POWERLINE_HIDE_USER_NAME" = "" ] && [ "$POWERLINE_HIDE_HOST_NAME" = "" ]; then
+    POWERLINE_USER_NAME="%n@%M"
+elif [ "$POWERLINE_HIDE_USER_NAME" != "" ] && [ "$POWERLINE_HIDE_HOST_NAME" = "" ]; then
+    POWERLINE_USER_NAME="@%M"
+elif [ "$POWERLINE_HIDE_USER_NAME" = "" ] && [ "$POWERLINE_HIDE_HOST_NAME" != "" ]; then
     POWERLINE_USER_NAME="%n"
 else
     POWERLINE_USER_NAME=""
@@ -59,17 +75,20 @@ ZSH_THEME_GIT_PROMPT_DELETED=" $POWERLINE_GIT_DELETED"
 ZSH_THEME_GIT_PROMPT_UNTRACKED=" $POWERLINE_GIT_UNTRACKED"
 ZSH_THEME_GIT_PROMPT_RENAMED=" $POWERLINE_GIT_RENAMED"
 ZSH_THEME_GIT_PROMPT_UNMERGED=" $POWERLINE_GIT_UNMERGED"
-ZSH_THEME_GIT_PROMPT_AHEAD_REMOTE="AHEAD"
-ZSH_THEME_GIT_PROMPT_BEHIND_REMOTE="BEHIND"
-ZSH_THEME_GIT_PROMPT_DIVERGED_REMOTE="DIVERGED"
-
+ZSH_THEME_GIT_PROMPT_AHEAD=" ⬆"
+ZSH_THEME_GIT_PROMPT_BEHIND=" ⬇"
+ZSH_THEME_GIT_PROMPT_DIVERGED=" ⬍"
 
 # if [ "$(git_prompt_info)" = "" ]; then
    # POWERLINE_GIT_INFO_LEFT=""
    # POWERLINE_GIT_INFO_RIGHT=""
 # else
     if [ "$POWERLINE_SHOW_GIT_ON_RIGHT" = "" ]; then
-        POWERLINE_GIT_INFO_LEFT=" %F{237}%K{240}"$'\ue0b0'"%F{white}%K{240}"$'$(git_prompt_info)$(git_prompt_status)%F{white}'
+        if [ "$POWERLINE_HIDE_GIT_PROMPT_STATUS" = "" ]; then
+            POWERLINE_GIT_INFO_LEFT=" %F{237}%K{240}"$'\ue0b0'"%F{white}%K{240}"$'$(git_prompt_info)$(git_prompt_status)%F{white}'
+        else
+            POWERLINE_GIT_INFO_LEFT=" %F{blue}%K{white}"$'\ue0b0'"%F{white}%F{black}%K{white}"$'$(git_prompt_info)%F{white}'
+        fi
         POWERLINE_GIT_INFO_RIGHT=""
     else
         POWERLINE_GIT_INFO_LEFT=""
@@ -99,4 +118,10 @@ if [ "$POWERLINE_NO_BLANK_LINE" = "" ]; then
 "$PROMPT
 fi
 
-RPROMPT="%(?..$POWERLINE_COLOR_FG_GRAY"$'\ue0b2'"$POWERLINE_COLOR_BG_GRAY%F{166} %? %k%f)"
+if [ "$POWERLINE_RIGHT_A" = "" ]; then
+    RPROMPT="$POWERLINE_GIT_INFO_RIGHT%F{white}"$'\ue0b2'"%k%F{black}%K{white} $POWERLINE_RIGHT_B %f%k"
+else
+    RPROMPT="$POWERLINE_GIT_INFO_RIGHT%F{white}"$'\ue0b2'"%k%F{black}%K{white} $POWERLINE_RIGHT_B %f%F{240}"$'\ue0b2'"%f%k%K{240}%F{255} $POWERLINE_RIGHT_A %f%k"
+fi
+
+RPROMPT="%(?..%F{240}"$'\ue0b2'"%K{240}%F{168} %? %k%f)"
